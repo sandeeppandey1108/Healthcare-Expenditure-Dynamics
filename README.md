@@ -27,6 +27,7 @@ This project aims to conduct an exploratory data analysis on the "Medical Cost P
 ## Objectives
 
 The primary objectives of this project are as follows:
+
 - Perform exploratory data analysis to understand the distribution and characteristics of the dataset.
 - Analyze the relationships between various factors (age, BMI, smoker status, etc.) and medical costs.
 - Visualize the data to gain insights into patterns and trends.
@@ -35,6 +36,7 @@ The primary objectives of this project are as follows:
 ## Tools and Libraries
 
 The analysis and visualization were conducted using the R programming language with the following libraries:
+
 - `tidyverse`: For data manipulation and visualization.
 - `ggplot2`: For creating various types of data visualizations.
 - `caret`: For building predictive models.
@@ -42,24 +44,29 @@ The analysis and visualization were conducted using the R programming language w
 ## How to Run
 
 1. **Clone the repository**:
+   ```sh
    git clone https://github.com/sandeeppandey1108/Healthcare-Expenditure-Dynamics.git
-   
+   ```
 
 2. **Navigate to the project directory**:
+   ```sh
    cd Healthcare-Expenditure-Dynamics
-   
+   ```
 
 3. **Set up the virtual environment**:
+   ```sh
    R -e "install.packages('renv'); renv::init()"
+   ```
 
 4. **Install the required dependencies**:
+   ```sh
    R -e "renv::restore()"
-   
+   ```
 
 5. **Run the R Markdown file**:
-   
+   ```sh
    R -e "rmarkdown::render('Healthcare Expenditure Dynamics.Rmd')"
-   
+   ```
 
 ## Analysis and Results
 
@@ -94,9 +101,9 @@ The analysis and visualization were conducted using the R programming language w
 
 ## Conclusions
 
-The analysis provided valuable insights into the factors influencing medical costs. Significant relationships between medical charges and attributes like age, BMI, and smoker status were identified. Predictive models were developed to estimate medical costs based on these attributes. 
+The analysis provided valuable insights into the factors influencing medical costs. Significant relationships between medical charges and attributes like age, BMI, and smoker status were identified. Predictive models were developed to estimate medical costs based on these attributes.
 
-### Suggestions for the Project
+## Suggestions for the Project
 
 - **Smoking Cessation Programs**: Considering the significant impact of smoking on medical charges, healthcare providers and policymakers should invest in smoking cessation programs and resources.
 - **Regional Healthcare Policies**: Addressing regional variations in medical charges requires tailored healthcare policies and initiatives.
