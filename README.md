@@ -109,5 +109,3 @@ The analysis provided valuable insights into the factors influencing medical cos
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-```
-
