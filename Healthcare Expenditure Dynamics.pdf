@@ -1,0 +1,216 @@
+---
+title: "Healthcare Expenditure Dynamics: An Exploratory Analysis"
+author: "Sandeep Pandey"
+date: "05/04/2024"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+---
+
+\`\`\`{r setup, include=FALSE} knitr::opts_chunk\$set(echo = TRUE)
+``
+
+# Importing Libraries
+```{r Libraries, echo=FALSE}
+#Required Libraries
+library(tidyverse)
+library(rgl)
+library(tidyverse)
+library(car)
+library(MASS)
+library(rpart)
+library(caret)
+library(dplyr)
+# Load the ggplot2 package for data visualization
+library(ggplot2)
+```
+
+# Importing Data
+```{r}
+#Import of Dataset
+medical_data <- read.csv("D:/Medical/insurance.csv")
+
+# View the structure of the dataset
+str(medical_data)
+
+# View the first few rows of the dataset
+head(medical_data)
+
+# Summary statistics of numerical variables
+summary(medical_data)
+```
+
+# Plots
+```{r Plots}
+# Histogram of Age
+ggplot(medical_data, aes(x = age)) +
+  geom_histogram(binwidth = 5, fill = "dodgerblue", color = "black") +
+  labs(title = "Distribution of Age", x = "Age", y = "Frequency")
+
+
+# Histogram of BMI
+ggplot(medical_data, aes(x = bmi)) +
+  geom_histogram(binwidth = 2, fill = "coral", color = "black") +
+  labs(title = "Distribution of BMI", x = "BMI", y = "Frequency")
+
+# Box plot of Charges by Smoker status
+ggplot(medical_data, aes(x = smoker, y = charges, fill = smoker)) +
+  geom_boxplot() +
+  labs(title = "Medical Charges by Smoker Status", x = "Smoker", y = "Charges")
+
+# Bar chart of Gender distribution
+ggplot(medical_data, aes(x = sex, fill = sex)) +
+  geom_bar() +
+  labs(title = "Gender Distribution", x = "Gender", y = "Count")
+
+# Bar chart of Smoker distribution
+ggplot(medical_data, aes(x = smoker, fill = smoker)) +
+  geom_bar() +
+  labs(title = "Smoker Distribution", x = "Smoker", y = "Count")
+
+# Bar chart of Region distribution
+ggplot(medical_data, aes(x = region, fill = region)) +
+  geom_bar() +
+  labs(title = "Region Distribution", x = "Region", y = "Count")
+
+# Box plot of Charges by Region
+ggplot(medical_data, aes(x = region, y = charges, fill = region)) +
+  geom_boxplot() +
+  labs(title = "Medical Charges by Region", x = "Region", y = "Charges")
+
+# Box plot of Charges by Smoker and Region
+ggplot(medical_data, aes(x = region, y = charges, fill = smoker)) +
+  geom_boxplot() +
+  labs(title = "Medical Charges by Smoker and Region", x = "Region", y = "Charges")
+
+# Scatter plot of Age vs. Charges
+ggplot(medical_data, aes(x = age, y = charges)) +
+  geom_point() +
+  labs(title = "Age vs. Charges", x = "Age", y = "Charges")
+
+# Scatter plot of BMI vs. Charges
+ggplot(medical_data, aes(x = bmi, y = charges)) +
+  geom_point() +
+  labs(title = "BMI vs. Charges", x = "BMI", y = "Charges")
+
+# Scatter plot of Age vs. Charges colored by Smoker status
+ggplot(medical_data, aes(x = age, y = charges, color = smoker)) +
+  geom_point() +
+  labs(title = "Age vs. Charges (colored by Smoker)", x = "Age", y = "Charges")
+
+# Scatter plot of BMI vs. Charges colored by Smoker status
+ggplot(medical_data, aes(x = bmi, y = charges, color = smoker)) +
+  geom_point() +
+  labs(title = "BMI vs. Charges (colored by Smoker)", x = "BMI", y = "Charges")
+
+```
+
+#Data Preprocessing
+```{r}
+# Check for missing values
+sum(is.na(medical_data))
+
+
+# Check the data types of variables
+str(medical_data)
+
+# Convert categorical variables to factors (if needed)
+medical_data$sex <- as.factor(medical_data$sex)
+medical_data$smoker <- as.factor(medical_data$smoker)
+medical_data$region <- as.factor(medical_data$region)
+```
+
+# Feature Scaling 
+```{r}
+# Split the data into training and testing sets (if building predictive models)
+set.seed(123)  # Set seed for reproducibility
+train_indices <- sample(1:nrow(medical_data), 0.8 * nrow(medical_data))  # 80% train, 20% test
+train_data <- medical_data[train_indices, ]
+test_data <- medical_data[-train_indices, ]
+```
+
+# QQ Plot
+```{r}
+# Plot QQ plots to check for normality of numerical variables
+# Here, we'll check the normality of the 'charges' variable
+qqnorm(medical_data$charges)
+qqline(medical_data$charges)
+```
+
+# Boxplots for T-test
+```{r}
+# Visualize the distribution of charges between smokers and non-smokers using boxplots
+ggplot(medical_data, aes(x = smoker, y = charges, fill = smoker)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Charges by Smoker status", x = "Smoker", y = "Charges")
+
+
+# Boxplots for ANOVA (Analysis of Variance)
+# Visualize the distribution of charges across regions using boxplots
+ggplot(medical_data, aes(x = region, y = charges, fill = region)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Charges by Region", x = "Region", y = "Charges")
+```
+
+# T-test
+```{r}
+# Conduct a hypothesis test to compare medical charges between smokers and non-smokers
+t_test_result <- t.test(charges ~ smoker, data = medical_data)
+t_test_result
+```
+
+# Linear Regression
+```{r}
+# Using 'lm()' function for linear regression
+model <- lm(charges ~ age + bmi + children + smoker + sex + region, data = train_data)
+
+# View the summary of the model
+summary(model)
+
+# Model Evaluation
+# Make predictions on the test data
+predictions <- predict(model, newdata = test_data)
+
+# Evaluate model performance (MAE and MSE)
+mae <- mean(abs(test_data$charges - predictions))
+mse <- mean((test_data$charges - predictions)^2)
+cat("Mean Absolute Error (MAE):", mae, "\n")
+cat("Mean Squared Error (MSE):", mse, "\n")
+
+# Model Interpretation and Visualization
+# Scatter plot of Actual vs. Predicted Charges
+ggplot(data.frame(actual = test_data$charges, predicted = predictions), aes(x = actual, y = predicted)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
+  labs(title = "Actual vs. Predicted Charges", x = "Actual Charges", y = "Predicted Charges")
+
+# Box plot of Charges by Smoker status (predicted vs. actual)
+ggplot(data.frame(smoker = test_data$smoker, charges = test_data$charges, predicted = predictions), aes(x = smoker, y = charges, fill = smoker)) +
+  geom_boxplot() +
+  geom_point(aes(y = predicted, color = "Predicted"), position = position_dodge(width = 0.75), size = 3) +
+  labs(title = "Charges by Smoker status (Predicted vs. Actual)", x = "Smoker", y = "Charges") +
+  scale_color_manual(values = "blue")
+
+```
+
+# Regression
+```{r}
+# Regression (Linear Regression)
+# Fit a linear regression model to predict charges based on age
+lm_model <- lm(charges ~ age, data = medical_data)
+summary(lm_model)
+
+
+#  Multi-linear Regression
+# Fit a multi-linear regression model to predict charges using multiple predictors
+multi_lm_model <- lm(charges ~ age + bmi + children + smoker + sex + region, data = medical_data)
+summary(multi_lm_model)
+
+
+# Logistic Regression
+# Fit a logistic regression model to predict smoker status based on age and charges
+logistic_model <- glm(smoker ~ age + charges, data = medical_data, family = "binomial")
+summary(logistic_model)
+```
+
